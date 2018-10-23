@@ -1,22 +1,22 @@
 package appmetrica
 
 type Application struct {
-	APIKey128             string `json:"api_key128"`
-	CreateDate            string `json:"create_date"`
-	GDPRAgreementAccepted bool   `json:"gdpr_agreement_accepted"`
-	HideAddress           bool   `json:"hide_address"`
-	ID                    uint64 `json:"id"`
-	Label                 string `json:"label"`
-	LabelID               uint64 `json:"label_id"`
-	Name                  string `json:"name"`
-	OwnerLogin            string `json:"owner_login"`
-	Permission            string `json:"permission"`
-	PermissionDate        string `json:"permission_date"`
-	Status                string `json:"status"`
-	TimeZoneName          string `json:"time_zone_name"`
-	TimeZoneOffset        int    `json:"time_zone_offset"`
-	UID                   uint64 `json:"uid"`
-	UseUniversalLinks     bool   `json:"use_universal_links"`
+	APIKey128             string `json:"api_key128,omitempty"`
+	CreateDate            string `json:"create_date,omitempty"`
+	GDPRAgreementAccepted bool   `json:"gdpr_agreement_accepted,omitempty"`
+	HideAddress           bool   `json:"hide_address,omitempty"`
+	ID                    uint64 `json:"id,omitempty"`
+	Label                 string `json:"label,omitempty"`
+	LabelID               uint64 `json:"label_id,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	OwnerLogin            string `json:"owner_login,omitempty"`
+	Permission            string `json:"permission,omitempty"`
+	PermissionDate        string `json:"permission_date,omitempty"`
+	Status                string `json:"status,omitempty"`
+	TimeZoneName          string `json:"time_zone_name,omitempty"`
+	TimeZoneOffset        int    `json:"time_zone_offset,omitempty"`
+	UID                   uint64 `json:"uid,omitempty"`
+	UseUniversalLinks     bool   `json:"use_universal_links,omitempty"`
 }
 
 type Applications []Application
@@ -27,12 +27,12 @@ type Error struct {
 }
 
 type Response struct {
-	Application  *Application  `json:"application"`
-	Applications []Application `json:"applications"`
+	Application  *Application  `json:"application,omitempty"`
+	Applications []Application `json:"applications,omitempty"`
 
-	Errors       []Error `json:"errors"`
-	ErrorCode    int     `json:"code"`
-	ErrorMessage string  `json:"message"`
+	Errors       []Error `json:"errors,omitempty"`
+	ErrorCode    int     `json:"code,omitempty"`
+	ErrorMessage string  `json:"message,omitempty"`
 }
 
 type ConnectionType int
