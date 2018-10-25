@@ -44,7 +44,6 @@ const (
 )
 
 type ImportEvent struct {
-	PostAPIKey         string      `json:"post_api_key"`
 	ApplicationID      int         `json:"application_id"`
 	ProfileID          string      `json:"profile_id"`
 	DeviceID           int         `json:"appmetrica_device_id"`

@@ -3,7 +3,10 @@ package appmetrica
 import (
 	"bytes"
 	"encoding/json"
+	"io"
+	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/valyala/fasthttp"
 	"golang.org/x/time/rate"
@@ -19,8 +22,8 @@ type Client struct {
 
 func NewClient(token string) *Client {
 	c := new(Client)
-	c.apikey = []byte("OAuth " + token)
 	c.client = &fasthttp.Client{Name: "appmetrica-go/0.0.0"}
+	c.SetAPIKey(token)
 	return c
 }
 
@@ -85,21 +88,37 @@ func (c *Client) DeleteApplication(id int) error {
 }
 
 // ImportEvent загружает информацию о событии.
-func (c *Client) ImportEvent() error {
-	return nil
+func (c *Client) ImportEvent(event ImportEvent) error {
+	return ErrNotImplemented
 }
 
-// ImportEvents загружает информацию о событиях.
-func (c *Client) ImportEvents() error {
-	return nil
+// ImportEvents загружает информацию о событиях. Функция в качестве аргумента
+// принимает интерфейс Reader. Предполагается, что пользователь самостоятельно
+// подготовил тело запроса в формате CSV, как того требует спецификация
+// AppMetrica API. Задачу может упростить реализация интерфейса Reader тип
+// EventImporter, который фильтрует и форматирует список событий.
+func (c *Client) ImportEvents(reader io.Reader) error {
+	req, res := c.prepare()
+	req.Header.SetMethod("POST")
+	req.Header.SetContentType(`text/csv; charset=UTF-8`)
+	io.Copy(req.BodyWriter(), reader)
+
+	uri := req.URI()
+	uri.SetPath(`/logs/v1/import/events.csv`)
+
+	args := uri.QueryArgs()
+	args.SetBytesV(`post_api_key`, c.apikeyPost)
+
+	var _, err = c.do(req, res, nil)
+	return err
 }
 
-func (c *Client) SetAPIKey(token []byte) {
-	c.apikey = token
+func (c *Client) SetAPIKey(token string) {
+	c.apikey = []byte(`OAuth ` + token)
 }
 
-func (c *Client) SetPostAPIKey(token []byte) {
-	c.apikeyPost = token
+func (c *Client) SetPostAPIKey(token string) {
+	c.apikeyPost = []byte(token)
 }
 
 func (c *Client) do(req *fasthttp.Request, res *fasthttp.Response, msg interface{}) (*Response, error) {
@@ -109,29 +128,59 @@ func (c *Client) do(req *fasthttp.Request, res *fasthttp.Response, msg interface
 	defer fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(res)
 
+	// Encoder JSON message.
 	if msg != nil {
 		enc := json.NewEncoder(req.BodyWriter())
-		req.Header.SetContentType(`application/json; encoding=utf-8`)
+		req.Header.SetContentType(`application/json; charset=UTF-8`)
 
 		if err = enc.Encode(msg); err != nil {
 			return &obj, err
 		}
 	}
 
+	// Print prepared request.
 	println("\033[1mRequest dump string\033[0m")
 	println(req.String())
 
+	// Make request.
 	if err = c.client.Do(req, res); err != nil {
 		return &obj, err
 	}
 
+	// Print received response.
 	println("\033[1mResponse dump string\033[0m")
 	println(res.String())
 
+	contentType := string(res.Header.Peek(`Content-Type`))
+	contentType = strings.Split(contentType, ";")[0]
+
+	switch contentType {
+	case "application/json", "application/x-yametrika+json":
+		return c.processJSON(res)
+	case "text/plain":
+		return c.processPlainText(res)
+	default:
+		var status = res.StatusCode()
+		var message = "unexpected content type: " + contentType
+		return &obj, NewError(status, message)
+	}
+}
+
+func (c *Client) processPlainText(res *fasthttp.Response) (*Response, error) {
+	if status := res.StatusCode(); status != http.StatusOK {
+		var message = string(res.Body())
+		return nil, NewError(status, message)
+	} else {
+		return nil, nil
+	}
+}
+
+func (c *Client) processJSON(res *fasthttp.Response) (*Response, error) {
 	var buf = bytes.NewBuffer(res.Body())
 	var dec = json.NewDecoder(buf)
+	var obj Response
 
-	if err = dec.Decode(&obj); err != nil {
+	if err := dec.Decode(&obj); err != nil {
 		return &obj, err
 	}
 
