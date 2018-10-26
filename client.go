@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/valyala/fasthttp"
 	"golang.org/x/time/rate"
@@ -22,8 +23,14 @@ type Client struct {
 
 func NewClient(token string) *Client {
 	c := new(Client)
-	c.client = &fasthttp.Client{Name: "appmetrica-go/0.0.0"}
 	c.SetAPIKey(token)
+	c.client = &fasthttp.Client{
+		Name:                "appmetrica-go/0.0.0",
+		MaxConnsPerHost:     10,
+		MaxIdleConnDuration: 30 * time.Second,
+		ReadTimeout:         60 * time.Second,
+		MaxResponseBodySize: 0, // Unlimited response body.
+	}
 	return c
 }
 
