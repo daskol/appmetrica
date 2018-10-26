@@ -31,8 +31,8 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// Application возвращает информацию об указанном приложении.
-func (c *Client) Application(id int) (*Application, error) {
+// GetApplication возвращает информацию об указанном приложении.
+func (c *Client) GetApplication(id int) (*Application, error) {
 	req, res := c.prepare()
 	uri := req.URI()
 	uri.SetPath(`/management/v1/application/` + strconv.Itoa(id))
@@ -40,8 +40,9 @@ func (c *Client) Application(id int) (*Application, error) {
 	return obj.Application, err
 }
 
-// Applications возвращает информацию о приложениях, доступных пользователю.
-func (c *Client) Applications() ([]Application, error) {
+// ListApplications возвращает информацию о приложениях, доступных
+// пользователю.
+func (c *Client) ListApplications() ([]Application, error) {
 	req, res := c.prepare()
 	uri := req.URI()
 	uri.SetPath(`/management/v1/applications`)
