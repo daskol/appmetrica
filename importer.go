@@ -55,6 +55,12 @@ type EventImporter struct {
 	events []*ImportEvent
 }
 
+// NewEventImporter creates new instance of EventImporter. Developer has to
+// specify type of user identifer which is either DeviceID or ProfileID and
+// optional list of attribution columns. The list of mandatory columns should
+// not to be specified since EventImporter adds them automatically. Mandatory
+// columns are ApplicationID, either ProfileID or DeviceId, EventName, and
+// EventTimestamp.
 func NewEventImporter(kind EventIdentifierType, header ...string) *EventImporter {
 	var importer = new(EventImporter)
 	importer.state = Initial
