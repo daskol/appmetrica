@@ -46,7 +46,7 @@ const (
 type ImportEvent struct {
 	ApplicationID      int         `json:"application_id"`
 	ProfileID          string      `json:"profile_id"`
-	DeviceID           int         `json:"appmetrica_device_id"`
+	DeviceID           uint64      `json:"appmetrica_device_id"`
 	IFA                string      `json:"ios_ifa,omitempty"`
 	IFV                string      `json:"ios_ifv,omitempty"`
 	GoogleAID          string      `json:"google_aid,omitempty"`

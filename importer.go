@@ -150,7 +150,7 @@ func (e *EventImporter) Read(buffer []byte) (int, error) {
 func (e *EventImporter) encodeEvent(event *ImportEvent) {
 	// Encode identifier device identifier.
 	if e.kind == DeviceID {
-		e.buffer = strconv.AppendInt(e.buffer, int64(event.DeviceID), 10)
+		e.buffer = strconv.AppendUint(e.buffer, event.DeviceID, 10)
 	} else {
 		e.buffer = append(e.buffer, event.ProfileID...)
 	}

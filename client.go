@@ -107,6 +107,7 @@ func (c *Client) ImportEvent(event ImportEvent) error {
 // EventImporter, который фильтрует и форматирует список событий.
 func (c *Client) ImportEvents(reader io.Reader) error {
 	req, res := c.prepare()
+	req.Header.Del("Authorization")
 	req.Header.SetMethod("POST")
 	req.Header.SetContentType(`text/csv; charset=UTF-8`)
 	io.Copy(req.BodyWriter(), reader)
