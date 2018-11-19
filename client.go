@@ -26,6 +26,7 @@ func NewClient(token string) *Client {
 	c.SetAPIKey(token)
 	c.client = &fasthttp.Client{
 		Name:                "appmetrica-go/0.0.0",
+		DialDualStack:       true,
 		MaxConnsPerHost:     10,
 		MaxIdleConnDuration: 30 * time.Second,
 		ReadTimeout:         60 * time.Second,
