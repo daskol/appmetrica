@@ -47,6 +47,7 @@ type ImportEvent struct {
 	ApplicationID      int         `json:"application_id"`
 	ProfileID          string      `json:"profile_id"`
 	DeviceID           uint64      `json:"appmetrica_device_id"`
+	SessionType        string      `json:"session_type,omitempty"`
 	IFA                string      `json:"ios_ifa,omitempty"`
 	IFV                string      `json:"ios_ifv,omitempty"`
 	GoogleAID          string      `json:"google_aid,omitempty"`

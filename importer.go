@@ -16,7 +16,8 @@ func init() {
 		"app_package_name", "app_version_name", "connection_type",
 		"device_ipv6", "device_locale", "device_manufacturer", "device_model",
 		"device_type", "event_json", "google_aid", "ios_ifa", "ios_ifv", "mcc",
-		"mnc", "operator_name", "os_name", "os_version", "windows_aid",
+		"mnc", "operator_name", "os_name", "os_version", "session_type",
+		"windows_aid",
 	}
 
 	allowedHeader = make(map[string]struct{}, len(header))
@@ -201,6 +202,8 @@ func (e *EventImporter) encodeOptionalColumns(event *ImportEvent) {
 			e.buffer = append(e.buffer, event.OSName...)
 		case "os_version":
 			e.buffer = append(e.buffer, event.OSVersion...)
+		case "session_type":
+			e.buffer = append(e.buffer, event.SessionType...)
 		case "windows_aid":
 			e.buffer = append(e.buffer, event.WindowsAID...)
 		default:
